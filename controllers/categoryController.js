@@ -15,7 +15,7 @@ const getCategories = (req, res) => {
     })
 };
 const getCategory = (req, res) => {
-    const { id } = req.params;
+    const { id } = req.query;
     const sql = "SELECT * FROM category WHERE id ='"+id+"'";
     connection_db.query(sql, (err,result) =>{
      if(err){
@@ -32,7 +32,7 @@ const getCategory = (req, res) => {
 
 
 const deleteCategory = (req, res) => {
-    const { id } = req.params;
+    const { id } = req.query;
     const sql1 = "SELECT * FROM category WHERE id ='"+id+"'";
     connection_db.query(sql1, (err,result) => {
      if(err){
@@ -71,7 +71,7 @@ const createCategory = (req, res) => {
 
 
 const updateCategory = (req, res) => {
-    const { id } = req.params;
+    const { id } = req.query;
     const sql1 = "SELECT * FROM category WHERE id ='"+id+"'";
     connection_db.query(sql1, (err,result) => {
      if(err){
