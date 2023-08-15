@@ -1,12 +1,13 @@
 const express = require('express');
 const { createCategory, deleteCategory, updateCategory, getCategories, getCategory } = require('../controllers/categoryController');
-const { isAuth } = require('../middlewares/authorization_cbo');
+const { isAuth, userById, isOwner, isAdmin } = require('../middlewares/authorization_cbo');
 const router = express.Router();
 
-router.get('/show',getCategories );
-router.get('/show/:id', getCategory);
-router.post('/create', isAuth, createCategory);
-router.delete('/delete/:id',isAuth, deleteCategory);
-router.put('/update/:id',isAuth, updateCategory);
+router.get('/showall',getCategories);
+router.get('/show', getCategory);
+router.post('/create/:idUser', isAuth, isOwner, isAdmin, createCategory);
+router.delete('/delete/:idUser',isAuth, isOwner, isAdmin, deleteCategory);
+router.put('/update/:idUser',isAuth, isOwner, isAdmin, updateCategory);
 
+router.param('idUser', userById)
 module.exports = router;
