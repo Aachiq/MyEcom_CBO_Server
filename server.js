@@ -12,7 +12,6 @@ const productRoutes = require('./routes/productRoutes');
 
 app.use(express.json());
 app.use(upload());
-
 // use Router as middelware
 app.use('/apicbo/auth',authRoutes);
 app.use('/apicbo/category',categoryRoutes);
