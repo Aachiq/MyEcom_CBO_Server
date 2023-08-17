@@ -1,5 +1,6 @@
 const connection_db = require('../database/connexion')
 const Joi = require('joi');
+const multer  = require('multer')
 
 const getProducts = (req, res) => {
     const sql = "SELECT * FROM product";
@@ -63,36 +64,39 @@ const createProduct = (req, res) => {
     description,
     price,
     quantity,
-    image,
     id_category
   } = req.body;
+  const { image } = req.files;
 
-   // use validator or Manula validation 
-   const signupSchema = Joi.object({
-    name: Joi.string().required(),
-    description: Joi.string().required(),
-    price: Joi.number().required(),
-    quantity: Joi.number().required(),
-    image: Joi.string().required(),
-    id_category: Joi.number().required()
-  });
+  console.log(req.body);
+  console.log(req.files);
 
-  const { error } = signupSchema.validate(req.body);
+  // use validator or Manula validation 
+  // const signupSchema = Joi.object({
+  //   name: Joi.string().required(),
+  //   description: Joi.string().required(),
+  //   price: Joi.number().required(),
+  //   quantity: Joi.number().required(),
+  //   image: Joi.string().required(),
+  //   id_category: Joi.number().required()
+  // });
 
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
-  }else{
-    const sql = `INSERT INTO product (name, description, price, quantity, image, id_category) 
-    VALUES ('${name}','${description}',${price},'${quantity}','${image}','${id_category}')`;
+  // const { error } = signupSchema.validate(req.body);
+
+  // if (error) {
+  //   return res.status(400).json({ error: error.details[0].message });
+  // }else{
+  //   const sql = `INSERT INTO product (name, description, price, quantity, image, id_category) 
+  //   VALUES ('${name}','${description}',${price},'${quantity}','${image}','${id_category}')`;
   
-    connection_db.query(sql, (err) =>{
-      if(err){
-        res.status(500).json({ message : err.message });
-      }else{
-        res.status(200).json({ message : "Product Inserted Successfully !" })
-      }
-    })
-  }
+  //   connection_db.query(sql, (err) =>{
+  //     if(err){
+  //       res.status(500).json({ message : err.message });
+  //     }else{
+  //       res.status(200).json({ message : "Product Inserted Successfully !" })
+  //     }
+  //   })
+  // }
 }
 
 const updateProduct = (req, res) => {
@@ -152,11 +156,15 @@ const updateProduct = (req, res) => {
   }) 
 };
 
+const getProductImage = (req, res) => {
+ // send image
+}
 
 module.exports = {
   createProduct,
   getProducts,
   getOneProduct,
   deleteProduct,
-  updateProduct
+  updateProduct,
+  getProductImage
 };
