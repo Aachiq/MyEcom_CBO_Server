@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const upload = require('express-fileupload');
 
 require('dotenv').config();
 const port = process.env.PORT;
@@ -9,8 +10,8 @@ const authRoutes = require('./routes/authRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const productRoutes = require('./routes/productRoutes');
 
-app.use(express.json())
-
+app.use(express.json());
+app.use(upload());
 // use Router as middelware
 app.use('/apicbo/auth',authRoutes);
 app.use('/apicbo/category',categoryRoutes);
