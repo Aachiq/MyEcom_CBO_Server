@@ -1,6 +1,7 @@
 const connection_db = require('../database/connexion')
 const Joi = require('joi');
 require('dotenv');
+const path = require('path');
 
 const getProducts = (req, res) => {
     const sql = "SELECT * FROM product";
@@ -83,13 +84,24 @@ const createProduct = (req, res) => {
   if (error) {
     return res.status(400).json({ error: error.details[0].message });
   }else{
-    image.mv(`${process.env.UPLOAD_DOCUMENT_PATH}/${image.name}`, (err) => {
+    // Validate file format (only allow JPEG and PNG)
+    const allowedFormats = ['image/jpeg', 'image/png'];
+    if (!allowedFormats.includes(image.mimetype)) {
+      return res.status(400).send('Invalid file format.');
+    }
+    // Validate file size (e.g., maximum 1 MB)
+    const maxSizeBytes = 1 * 1024 * 1024; // 1 MB
+    if (image.size > maxSizeBytes) {
+      return res.status(400).send('File size not accepted !');
+    }
+    const customFileName = Date.now() + path.extname(image.name);
+    image.mv(`${process.env.UPLOAD_DOCUMENT_PATH}/${customFileName}`, (err) => {
       if(err){
         res.json({ message : err.message })
       }else{
         // don't store the same file name as user choose. new Date().Now()
         const sql = `INSERT INTO product (name, description, price, quantity, image, id_category) 
-        VALUES ('${name}','${description}',${price},'${quantity}','${image.name}','${id_category}')`;
+        VALUES ('${name}','${description}',${price},'${quantity}','${customFileName}','${id_category}')`;
         
         connection_db.query(sql, (err) =>{
           if(err){
@@ -102,30 +114,7 @@ const createProduct = (req, res) => {
     })
   }
 }
-/*
-  app.post('/upload', (req, res) => {
-    // req.files contains uploaded files
-    console.log(req.files);
 
-    // Handle the uploaded files
-    if (req.files && req.files.file) {
-        const uploadedFile = req.files.file;
-        
-        // Generate a new filename using Date.now() and the original file extension
-        const newFilename = Date.now() + path.extname(uploadedFile.name);
-        
-        // Move the uploaded file to a new location with the new filename
-        uploadedFile.mv('./uploads/' + newFilename, (err) => {
-            if (err) {
-                return res.status(500).send(err);
-            }
-            res.send('File uploaded');
-        });
-    } else {
-        res.status(400).send('No file uploaded');
-    }
-}); 
-*/
 const updateProduct = (req, res) => {
     const { id } = req.query;
     const sql1 = "SELECT * FROM product WHERE id ='"+id+"'";
@@ -184,8 +173,38 @@ const updateProduct = (req, res) => {
     })
 };
 
+const searchProduct = (req, res) => {
+
+  const { word } = req.body;
+  const sql = `SELECT * FROM product WHERE name LIKE '%${word}%' OR description LIKE '%${word}%'`;
+  
+  connection_db.query(sql, (err,result) => {
+    if(err){
+     res.status(500).json({error: err.message})
+    }else{
+     if(result.length === 0){
+      res.status(200).json({message : "No Product Found for Search !"})
+     }else{
+      res.json({ products : result })
+     }
+    }
+  })
+}
+
 const getProductImage = (req, res) => {
- // send image
+  const { id } = req.query;
+  const sql = "SELECT * FROM product WHERE id ='"+id+"'";
+  connection_db.query(sql, (err,result) =>{
+   if(err){
+      res.status(500).json({ message : err.message });
+   }else{
+      if(result.length === 0){
+          res.json({message : "No Product Found With ID = " + id + "!"})
+      }else{
+          res.sendFile(`${process.env.UPLOAD_DOCUMENT_PATH}/${result[0].image}`)
+      }
+   }
+  })
 }
 
 module.exports = {
@@ -194,5 +213,6 @@ module.exports = {
   getOneProduct,
   deleteProduct,
   updateProduct,
-  getProductImage
+  getProductImage,
+  searchProduct
 };
