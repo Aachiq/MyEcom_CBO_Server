@@ -173,8 +173,38 @@ const updateProduct = (req, res) => {
     })
 };
 
+const searchProduct = (req, res) => {
+
+  const { word } = req.body;
+  const sql = `SELECT * FROM product WHERE name LIKE '%${word}%' OR description LIKE '%${word}%'`;
+  
+  connection_db.query(sql, (err,result) => {
+    if(err){
+     res.status(500).json({error: err.message})
+    }else{
+     if(result.length === 0){
+      res.status(200).json({message : "No Product Found for Search !"})
+     }else{
+      res.json({ products : result })
+     }
+    }
+  })
+}
+
 const getProductImage = (req, res) => {
- // send image
+  const { id } = req.query;
+  const sql = "SELECT * FROM product WHERE id ='"+id+"'";
+  connection_db.query(sql, (err,result) =>{
+   if(err){
+      res.status(500).json({ message : err.message });
+   }else{
+      if(result.length === 0){
+          res.json({message : "No Product Found With ID = " + id + "!"})
+      }else{
+          res.sendFile(`${process.env.UPLOAD_DOCUMENT_PATH}/${result[0].image}`)
+      }
+   }
+  })
 }
 
 module.exports = {
@@ -183,5 +213,6 @@ module.exports = {
   getOneProduct,
   deleteProduct,
   updateProduct,
-  getProductImage
+  getProductImage,
+  searchProduct
 };
