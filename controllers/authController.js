@@ -14,7 +14,7 @@ const Signin = async (req,res)=>{
     if (error) {
       return res.status(400).json({ error: error.details[0].message });
     }else{
-      const sql = "SELECT * FROM users_cbo WHERE login='"+login+"'";
+      const sql = "SELECT * FROM users_cbo WHERE login='"+login+"' AND password ='"+password+"'";
       connection_db.query(sql, async (err, result) => {
           if (err) {
             console.log(err);
