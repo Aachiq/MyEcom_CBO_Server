@@ -117,11 +117,46 @@ const searchCategory = (req,res)=>{
     }) 
 }
 
+const paginationCatgeory = (req, res) => {
+  let page;
+  if(!req.query.page){
+    //page = 0;
+    page = 1;
+  }else{
+    page = req.query.page;
+  }
+
+  connection_db.query("SELECT * FROM category",(err,result)=>{
+    if(err){
+        res.json({error : err})
+    }else{
+        if(result.length === 0){
+            res.json({message : "No Catgeory Found !"})
+        }else{
+            const item_lenght = result.length;
+            const items_per_page = 5;
+            const number_of_page = item_lenght / items_per_page;
+            // number_of_page / it's usefull only for front to create list of numbers of pagination
+            
+            let page_first_result = (page - 1) * items_per_page;
+
+            const sql = `SELECT * FROM category LIMIT ${items_per_page} OFFSET ${page_first_result}`;
+            connection_db.query(sql,(err,result)=>{
+                if(err) console.log(err)
+                res.json({ paginatedCategory: result })
+            })
+        }
+    }   
+  })
+
+}
+
 module.exports = {
     getCategories,
     getCategory,
     createCategory,
     deleteCategory,
     searchCategory,
+    paginationCatgeory,
     updateCategory,
 };
