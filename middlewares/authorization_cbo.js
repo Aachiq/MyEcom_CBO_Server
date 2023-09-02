@@ -38,7 +38,7 @@ exports.userById = (req, res, next) => {
 }
 
 exports.isOwner= (req, res, next) => {
-
+  
   let isOwn = req.user && req.auth && (req.user.id == req.auth.idUser)
   if(!isOwn) {
       return res.status(403).json({
