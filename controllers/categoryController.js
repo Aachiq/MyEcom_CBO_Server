@@ -101,11 +101,27 @@ const updateCategory = (req, res) => {
     }) 
 };
 
+const searchCategory = (req,res)=>{
+    const { word } = req.body;
+    const sql = " SELECT * FROM category WHERE name LIKE '%"+word+"%' ";
+    connection_db.query(sql, (err,result) => {
+        if(err){
+            res.status(500).json({message : err})
+        }else{
+            if(result.length === 0){
+                res.json({message : "No Catgeory Found !"})
+            }else{
+                res.json({ foundCategories : result });
+            }
+        }
+    }) 
+}
 
 module.exports = {
     getCategories,
     getCategory,
     createCategory,
     deleteCategory,
-    updateCategory
+    searchCategory,
+    updateCategory,
 };
