@@ -191,6 +191,40 @@ const searchProduct = (req, res) => {
   })
 }
 
+const paginationProduct = (req, res) => {
+  let page;
+  if(!req.query.page){
+    //page = 0;
+    page = 1;
+  }else{
+    page = req.query.page;
+  }
+
+  connection_db.query("SELECT * FROM product",(err,result)=>{
+    if(err){
+        res.json({error : err})
+    }else{
+        if(result.length === 0){
+            res.json({ message : "No Product Found !" })
+        }else{
+            const item_lenght = result.length;
+            const items_per_page = 5;
+            const number_of_page = item_lenght / items_per_page;
+            // number_of_page / it's usefull only for front to create list of numbers of pagination
+            
+            let page_first_result = (page - 1) * items_per_page;
+
+            const sql = `SELECT * FROM product LIMIT ${items_per_page} OFFSET ${page_first_result}`;
+            connection_db.query(sql,(err,result)=>{
+                if(err) console.log(err)
+                res.json({ paginatedProduct: result })
+            })
+        }
+    }   
+  })
+
+}
+
 const getProductImage = (req, res) => {
   const { id } = req.query;
   const sql = "SELECT * FROM product WHERE id ='"+id+"'";
@@ -214,5 +248,6 @@ module.exports = {
   deleteProduct,
   updateProduct,
   getProductImage,
-  searchProduct
+  searchProduct,
+  paginationProduct
 };
