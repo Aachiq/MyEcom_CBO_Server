@@ -42,6 +42,59 @@ const deleteOrder = (req, res) => {
      }
     });
 }
+
+const searchOrder = (req, res) => {
+
+    const { word } = req.body;
+    const sql = `SELECT * FROM order_mvp WHERE address LIKE '%${word}%'`;
+    
+    connection_db.query(sql, (err,result) => {
+      if(err){
+       res.status(500).json({error: err.message})
+      }else{
+       if(result.length === 0){
+        res.status(200).json({message : "No Order Found for Search !"})
+       }else{
+        res.json({ foundOrders : result })
+       }
+      }
+    })
+  }
+  
+  const paginationOrder = (req, res) => {
+    let page;
+    if(!req.query.page){
+      //page = 0;
+      page = 1;
+    }else{
+      page = req.query.page;
+    }
+  
+    connection_db.query("SELECT * FROM order_mvp", (err,result) => {
+      if(err){
+          res.json({error : err})
+      }else{
+          if(result.length === 0){
+              res.json({ message : "No Order Found !" })
+          }else{
+              const item_lenght = result.length;
+              const items_per_page = 5;
+              const number_of_page = item_lenght / items_per_page;
+              // number_of_page / it's usefull only for front to create list of numbers of pagination
+              
+              let page_first_result = (page - 1) * items_per_page;
+  
+              const sql = `SELECT * FROM order_mvp LIMIT ${items_per_page} OFFSET ${page_first_result}`;
+              connection_db.query(sql,(err,result)=>{
+                  if(err) console.log(err)
+                  res.json({ paginatedOrder : result })
+              })
+          }
+      }   
+    })
+  
+  }
+
 // there is no create order in CBO because it's BackOffice not clinet that gonna buy a product
 // there is no Update order in CBO because it's BackOffice not clinet that gonna buy a product
 
@@ -66,5 +119,7 @@ router.get('/archive/:id', (req,res) => {
 
 module.exports = {
     getOrders,
-    deleteOrder
+    deleteOrder,
+    searchOrder,
+    paginationOrder
 };

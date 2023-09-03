@@ -1,10 +1,13 @@
 const express = require('express');
-const { getOrders, deleteOrder } = require('../controllers/orderController');
+const { getOrders, deleteOrder, searchOrder, paginationOrder } = require('../controllers/orderController');
 const { isAuth, isOwner, isAdmin, userById } = require('../middlewares/authorization_cbo');
 const router = express.Router();
 
 router.get('/showall',getOrders);
 router.delete('/delete/:idUser',isAuth, isOwner, isAdmin, deleteOrder);
+router.post('/delete/:idUser',isAuth, isOwner, isAdmin, deleteOrder);
+router.post('/search', searchOrder );
+router.get('/paginate', paginationOrder );
 
 router.param('idUser', userById)
 
