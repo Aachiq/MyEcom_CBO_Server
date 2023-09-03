@@ -185,7 +185,7 @@ const searchProduct = (req, res) => {
      if(result.length === 0){
       res.status(200).json({message : "No Product Found for Search !"})
      }else{
-      res.json({ products : result })
+      res.json({ foundProducts : result })
      }
     }
   })
