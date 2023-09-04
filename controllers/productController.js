@@ -117,13 +117,15 @@ const createProduct = (req, res) => {
 
 const updateProduct = (req, res) => {
     const { id } = req.query;
+
     const sql1 = "SELECT * FROM product WHERE id ='"+id+"'";
+    
     connection_db.query(sql1, (err,result) => {
      if(err){
         res.status(500).json({ message : err.message });
      }else{
         if(result.length === 0){
-          res.json({message : "No Produc Found With ID = " + id + "!"})
+          res.json({message : "No Product Found With ID = " + id + "!"})
         }else{
           const { 
             name,
@@ -133,6 +135,7 @@ const updateProduct = (req, res) => {
             id_category
           } = req.body;
           const { image } = req.files;
+
           // use validator or Manula validation 
           const signupSchema = Joi.object({
             name: Joi.string().required(),
