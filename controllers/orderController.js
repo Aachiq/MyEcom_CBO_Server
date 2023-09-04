@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const connection_db = require('../database/connexion')
+const excel = require('exceljs');
 
 
 const getOrders = (req,res) => {
@@ -95,6 +96,78 @@ const searchOrder = (req, res) => {
   
   }
 
+  const generateAndDowlaodExcel = (req, res) => {
+
+   // select table 
+   connection_db.query("SELECT * FROM order_mvp ", function (err, data, fields) {	
+    const jsonData = JSON.parse(JSON.stringify(data));
+    console.log(jsonData);
+
+    //creating workbook
+    let workbook = new excel.Workbook(); 
+
+    //creating worksheet
+    let worksheet = workbook.addWorksheet('Orders'); 
+
+    worksheet.columns = [
+        { header: 'Id', key: '_id', width: 10 },
+        { header: 'Phone', key: 'phone', width: 10 },
+        { header: 'Address', key: 'addess', width: 10},
+        { header: 'id_product', key: 'id_product', width: 10},
+        { header: 'id_user', key: 'id_user', width: 10 },
+        { header: 'date_order', key: 'date_order', width: 10 },
+        { header: 'payment_type', key: 'payment_type', width: 10},
+        { header: 'amount', key: 'amount', width: 10, outlineLevel: 1},
+    ];
+    // Add Array Rows
+	worksheet.addRows(jsonData);
+
+    // #### save Excel file in Directoty
+    //  workbook.xlsx.writeFile("product.xlsx")
+    //  .then(()=>{
+    //     console.log("file saved!");
+    // })
+    //  .catch((err)=> console.log(err))
+    // ### END save excel file
+
+     res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+     );
+
+      workbook.xlsx.write(res).then(() => {
+        res.end();
+      });
+
+    // ### SOLUTION 2
+    // connection_db.query('SELECT * FROM users', (err, results) => {
+    //     if (err) {
+    //       console.error(err);
+    //       res.status(500).send('Internal Server Error');
+    //       return;
+    //     }
+    
+    //     // Generate Excel file
+    //     const workbook = new exceljs.Workbook();
+    //     const worksheet = workbook.addWorksheet('Users');
+        
+    //     // Add headers
+    //     worksheet.addRow(['ID', 'Name', 'Email']);
+        
+    //     // Add data
+    //     results.forEach((user) => {
+    //       worksheet.addRow([user.id, user.name, user.email]);
+    //     });
+        
+    //     // Send the generated Excel file as a response
+    //     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //     res.setHeader('Content-Disposition', 'attachment; filename=users.xlsx');
+    // })
+    // ### END SOLUTION 2
+
+    })
+  }
+
 // there is no create order in CBO because it's BackOffice not clinet that gonna buy a product
 // there is no Update order in CBO because it's BackOffice not clinet that gonna buy a product
 
@@ -121,5 +194,6 @@ module.exports = {
     getOrders,
     deleteOrder,
     searchOrder,
-    paginationOrder
+    paginationOrder,
+    generateAndDowlaodExcel
 };
