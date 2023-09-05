@@ -207,11 +207,75 @@ const getOrdersByPaymentType = (req,res) => {
     })
 };
 
+const getOrdersByDate = (req,res) => {
+    const {filterDate} = req.body;
+    let sql = "";
+    switch(filterDate) {
+        case 'ANY' : {
+            sql = "SELECT * FROM order_mvp";
+        };
+        break;
+        case 'TODAY' : {
+            sql = `SELECT * FROM order_mvp WHERE date_order = CURDATE()`; 
+        };
+        break;
+        case 'YESTERDAY' : {
+            sql = `SELECT * FROM order_mvp WHERE date_order = CURDATE() - 1`; 
+        };
+        break;
+        case 'CURRENT_WEEK' : {
+            sql = `SELECT * FROM order_mvp WHERE WEEK(date_order) = WEEK(CURDATE())`; 
+        };
+        break;
+        case 'LAST_WEEK' : {
+            sql = `SELECT * FROM order_mvp WHERE WEEK(date_order) = WEEK(CURDATE()) - 1`; 
+        };
+        break;
+        case 'CURRENT_MONTH' : {
+            sql = `SELECT * FROM order_mvp WHERE MONTHd(ate_order) = MONTH(CURDATE())`; 
+        };
+        break;
+        case 'LAST_MONTH' : {
+            sql = `SELECT * FROM order_mvp WHERE MONTHd(ate_order) = MONTH(CURDATE()) - 1`; 
+        };
+        break;
+        case 'CURRENT_YEAR' : {
+            sql = `SELECT * FROM order_mvp WHERE YEAR(date_order) = YEAR(CURDATE())`; 
+        };
+        break;
+        case 'LAST_YEAR' : {
+            sql = `SELECT * FROM order_mvp WHERE YEAR(date_order) = YEAR(CURDATE() - 1)`; 
+        };
+        break;
+        case 'OVER_2020' : {
+            sql = `SELECT * FROM order_mvp WHERE YEAR(date_order) >= 2020`; 
+        };
+        break;
+        case 'UNDER_2020' : {
+            sql = `SELECT * FROM order_mvp WHERE YEAR(date_order) < 2020`; 
+        };
+        break;
+    }
+    
+    connection_db.query(sql, (err,result) =>{
+     if(err){
+        res.status(500).json({message : err.message});
+     }else{
+        if(result.length === 0){
+            res.json({message : "No Order Found for this Date !"})
+        }else{
+            res.status(200).json({ordersByDate : result})
+        }
+     }
+    })
+};
+
 module.exports = {
     getOrders,
     deleteOrder,
     searchOrder,
     paginationOrder,
     generateAndDowlaodExcel,
-    getOrdersByPaymentType
+    getOrdersByPaymentType,
+    getOrdersByDate
 };
