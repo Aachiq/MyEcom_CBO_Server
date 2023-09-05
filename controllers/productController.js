@@ -262,6 +262,24 @@ const getProductsByCategory = (req, res) => {
   })
 }
 
+const getProductsByCategoryPrice = (req, res) => {
+
+  const { priceRange } = req.body;
+  const sql = `SELECT * FROM product WHERE price BETWEEN ${priceRange[0]} AND ${priceRange[1]}`;
+  
+  connection_db.query(sql, (err,result) => {
+    if(err){
+     res.status(500).json({error: err.message})
+    }else{
+     if(result.length === 0){
+      res.status(200).json({message : "No Products Found With given Price Range !"})
+     }else{
+      res.json({ products : result })
+     }
+    }
+  })
+}
+
 module.exports = {
   createProduct,
   getProducts,
@@ -271,5 +289,6 @@ module.exports = {
   getProductImage,
   searchProduct,
   paginationProduct,
-  getProductsByCategory
+  getProductsByCategory,
+  getProductsByCategoryPrice
 };
