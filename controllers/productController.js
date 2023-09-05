@@ -244,6 +244,24 @@ const getProductImage = (req, res) => {
   })
 }
 
+const getProductsByCategory = (req, res) => {
+
+  const { idCategory } = req.params;
+  const sql = `SELECT * FROM product WHERE id_category = ${idCategory}`;
+  
+  connection_db.query(sql, (err,result) => {
+    if(err){
+     res.status(500).json({error: err.message})
+    }else{
+     if(result.length === 0){
+      res.status(200).json({message : "No Products Found With given Category !"})
+     }else{
+      res.json({ products : result })
+     }
+    }
+  })
+}
+
 module.exports = {
   createProduct,
   getProducts,
@@ -252,5 +270,6 @@ module.exports = {
   updateProduct,
   getProductImage,
   searchProduct,
-  paginationProduct
+  paginationProduct,
+  getProductsByCategory
 };

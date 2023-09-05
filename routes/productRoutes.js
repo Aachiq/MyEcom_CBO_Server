@@ -1,5 +1,5 @@
 const express = require('express');
-const { createProduct, getProducts, getOneProduct, deleteProduct, updateProduct, getProductImage, searchProduct, paginationProduct } = require('../controllers/productController');
+const { createProduct, getProducts, getOneProduct, deleteProduct, updateProduct, getProductImage, searchProduct, paginationProduct, getProductsByCategory } = require('../controllers/productController');
 const { isAuth, userById, isOwner, isAdmin } = require('../middlewares/authorization_cbo');
 const router = express.Router();
 
@@ -11,6 +11,7 @@ router.put('/update/:idUser',isAuth, isOwner, isAdmin, updateProduct );
 router.post('/search', searchProduct );
 router.get('/paginate', paginationProduct );
 router.get('/show-image/:idUser',isAuth, isOwner, getProductImage );
+router.get('/show/:idCategory',getProductsByCategory );
 
 router.param('idUser', userById)
 module.exports = router;
