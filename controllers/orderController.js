@@ -190,10 +190,28 @@ router.get('/archive/:id', (req,res) => {
     })
 });
 
+const getOrdersByPaymentType = (req,res) => {
+    const {payType} = req.query;
+    const sql = `SELECT * FROM order_mvp WHERE payment_type ='${payType}'`;
+
+    connection_db.query(sql, (err,result) =>{
+     if(err){
+        res.status(500).json({message : err.message});
+     }else{
+        if(result.length === 0){
+            res.json({message : "No Order Found !"})
+        }else{
+            res.status(200).json({ordersPaymenType : result})
+        }
+     }
+    })
+};
+
 module.exports = {
     getOrders,
     deleteOrder,
     searchOrder,
     paginationOrder,
-    generateAndDowlaodExcel
+    generateAndDowlaodExcel,
+    getOrdersByPaymentType
 };
